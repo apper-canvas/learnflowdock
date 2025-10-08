@@ -255,8 +255,8 @@ return (
 
           <div className="flex items-center justify-between mb-2">
             <div>
-              <div className="text-sm text-gray-600 mb-1">{lesson.moduleTitle}</div>
-              <h1 className="text-3xl font-bold text-gray-900">{lesson.title}</h1>
+<div className="text-sm text-gray-600 mb-1">{lesson.moduleTitle}</div>
+<h1 className="text-3xl font-bold text-gray-900">{lesson.title}</h1>
             </div>
             <Button
               variant="ghost"
@@ -266,7 +266,7 @@ return (
               <ApperIcon name={sidebarOpen ? "PanelLeftClose" : "PanelLeftOpen"} size={20} />
             </Button>
           </div>
-          <p className="text-gray-600">{lesson.description}</p>
+<p className="text-gray-600">{lesson.description}</p>
         </div>
 
         {lesson.type === "video" ? (
@@ -277,7 +277,7 @@ return (
                   ref={videoRef}
                   controls
                   className="w-full h-full"
-                  src={lesson.videoUrl}
+src={lesson.videoUrl}
                 >
                   Your browser does not support the video tag.
                 </video>
@@ -326,7 +326,7 @@ return (
                                 <ApperIcon name="Trash2" size={14} className="text-gray-500" />
                               </button>
                             </div>
-                            <p className="text-sm text-gray-700 leading-relaxed">{note.text}</p>
+<p className="text-sm text-gray-700 leading-relaxed">{note.text}</p>
                           </div>
                         ))
                       )}

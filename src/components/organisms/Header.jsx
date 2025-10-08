@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import { AuthContext } from '../../App';
 import Button from "@/components/atoms/Button";
 import ApperIcon from "@/components/ApperIcon";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +10,8 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useSelector((state) => state.user);
+  const { logout } = useContext(AuthContext);
 
   const navItems = [
     { label: "Browse Courses", path: "/courses", icon: "Library" },
@@ -48,10 +52,14 @@ const Header = () => {
             </nav>
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+<div className="hidden md:flex items-center gap-3">
             <Button variant="ghost" onClick={() => navigate("/courses")}>
               <ApperIcon name="Search" size={18} className="mr-2" />
               Search
+            </Button>
+            <Button variant="ghost" onClick={logout}>
+              <ApperIcon name="LogOut" size={18} className="mr-2" />
+              Logout
             </Button>
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-700 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
               <ApperIcon name="User" size={20} className="text-white" />
@@ -113,16 +121,24 @@ const Header = () => {
                   ))}
                 </nav>
 
-                <div className="pt-6 border-t border-gray-200">
+<div className="pt-6 border-t border-gray-200 space-y-3">
                   <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-50">
                     <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-700 rounded-full flex items-center justify-center">
                       <ApperIcon name="User" size={24} className="text-white" />
                     </div>
                     <div>
-                      <div className="font-semibold text-gray-900">Student</div>
-                      <div className="text-sm text-gray-600">View Profile</div>
+                      <div className="font-semibold text-gray-900">{user?.firstName || 'Student'} {user?.lastName || ''}</div>
+                      <div className="text-sm text-gray-600">{user?.emailAddress || 'View Profile'}</div>
                     </div>
                   </div>
+                  <Button 
+                    variant="ghost" 
+                    onClick={logout}
+                    className="w-full justify-start"
+                  >
+                    <ApperIcon name="LogOut" size={18} className="mr-2" />
+                    Logout
+                  </Button>
                 </div>
               </div>
             </motion.div>

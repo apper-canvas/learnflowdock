@@ -1,58 +1,269 @@
-import coursesData from "@/services/mockData/courses.json";
-
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const courseService = {
   getAll: async () => {
-    await delay(300);
-    return [...coursesData];
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const response = await apperClient.fetchRecords('course_c', {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "instructor_c"}},
+          {"field": {"Name": "thumbnail_c"}},
+          {"field": {"Name": "category_c"}},
+          {"field": {"Name": "difficulty_c"}},
+          {"field": {"Name": "duration_c"}},
+          {"field": {"Name": "enrolled_count_c"}},
+          {"field": {"Name": "modules_c"}}
+        ]
+      });
+
+      if (!response.success || !response.data) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data.map(course => ({
+        Id: course.Id,
+        title: course.title_c,
+        description: course.description_c,
+        instructor: course.instructor_c,
+        thumbnail: course.thumbnail_c,
+        category: course.category_c,
+        difficulty: course.difficulty_c,
+        duration: course.duration_c,
+        enrolledCount: course.enrolled_count_c,
+        modules: course.modules_c ? JSON.parse(course.modules_c) : []
+      }));
+    } catch (error) {
+      console.error("Error fetching courses:", error?.message || error);
+      return [];
+    }
   },
 
   getById: async (id) => {
-    await delay(200);
-    const course = coursesData.find((c) => c.Id === parseInt(id));
-    return course ? { ...course } : null;
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const response = await apperClient.getRecordById('course_c', parseInt(id), {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "instructor_c"}},
+          {"field": {"Name": "thumbnail_c"}},
+          {"field": {"Name": "category_c"}},
+          {"field": {"Name": "difficulty_c"}},
+          {"field": {"Name": "duration_c"}},
+          {"field": {"Name": "enrolled_count_c"}},
+          {"field": {"Name": "modules_c"}}
+        ]
+      });
+
+      if (!response.success || !response.data) {
+        console.error(response.message);
+        return null;
+      }
+
+      const course = response.data;
+      return {
+        Id: course.Id,
+        title: course.title_c,
+        description: course.description_c,
+        instructor: course.instructor_c,
+        thumbnail: course.thumbnail_c,
+        category: course.category_c,
+        difficulty: course.difficulty_c,
+        duration: course.duration_c,
+        enrolledCount: course.enrolled_count_c,
+        modules: course.modules_c ? JSON.parse(course.modules_c) : []
+      };
+    } catch (error) {
+      console.error(`Error fetching course ${id}:`, error?.message || error);
+      return null;
+    }
   },
 
   getByCategory: async (category) => {
-    await delay(300);
-    if (!category || category === "All") {
-      return [...coursesData];
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "instructor_c"}},
+          {"field": {"Name": "thumbnail_c"}},
+          {"field": {"Name": "category_c"}},
+          {"field": {"Name": "difficulty_c"}},
+          {"field": {"Name": "duration_c"}},
+          {"field": {"Name": "enrolled_count_c"}},
+          {"field": {"Name": "modules_c"}}
+        ]
+      };
+
+      if (category && category !== "All") {
+        params.where = [
+          {"FieldName": "category_c", "Operator": "EqualTo", "Values": [category]}
+        ];
+      }
+
+      const response = await apperClient.fetchRecords('course_c', params);
+
+      if (!response.success || !response.data) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data.map(course => ({
+        Id: course.Id,
+        title: course.title_c,
+        description: course.description_c,
+        instructor: course.instructor_c,
+        thumbnail: course.thumbnail_c,
+        category: course.category_c,
+        difficulty: course.difficulty_c,
+        duration: course.duration_c,
+        enrolledCount: course.enrolled_count_c,
+        modules: course.modules_c ? JSON.parse(course.modules_c) : []
+      }));
+    } catch (error) {
+      console.error("Error fetching courses by category:", error?.message || error);
+      return [];
     }
-    return coursesData.filter((c) => c.category === category);
   },
 
   searchCourses: async (query) => {
-    await delay(250);
-    if (!query) return [...coursesData];
-    const lowerQuery = query.toLowerCase();
-    return coursesData.filter(
-      (c) =>
-        c.title.toLowerCase().includes(lowerQuery) ||
-        c.description.toLowerCase().includes(lowerQuery) ||
-        c.instructor.toLowerCase().includes(lowerQuery) ||
-        c.category.toLowerCase().includes(lowerQuery)
-    );
+    try {
+      if (!query) return await courseService.getAll();
+
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const response = await apperClient.fetchRecords('course_c', {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "title_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "instructor_c"}},
+          {"field": {"Name": "thumbnail_c"}},
+          {"field": {"Name": "category_c"}},
+          {"field": {"Name": "difficulty_c"}},
+          {"field": {"Name": "duration_c"}},
+          {"field": {"Name": "enrolled_count_c"}},
+          {"field": {"Name": "modules_c"}}
+        ],
+        whereGroups: [{
+          operator: "OR",
+          subGroups: [
+            {
+              conditions: [
+                {"fieldName": "title_c", "operator": "Contains", "values": [query]}
+              ],
+              operator: ""
+            },
+            {
+              conditions: [
+                {"fieldName": "description_c", "operator": "Contains", "values": [query]}
+              ],
+              operator: ""
+            },
+            {
+              conditions: [
+                {"fieldName": "instructor_c", "operator": "Contains", "values": [query]}
+              ],
+              operator: ""
+            },
+            {
+              conditions: [
+                {"fieldName": "category_c", "operator": "Contains", "values": [query]}
+              ],
+              operator: ""
+            }
+          ]
+        }]
+      });
+
+      if (!response.success || !response.data) {
+        console.error(response.message);
+        return [];
+      }
+
+      return response.data.map(course => ({
+        Id: course.Id,
+        title: course.title_c,
+        description: course.description_c,
+        instructor: course.instructor_c,
+        thumbnail: course.thumbnail_c,
+        category: course.category_c,
+        difficulty: course.difficulty_c,
+        duration: course.duration_c,
+        enrolledCount: course.enrolled_count_c,
+        modules: course.modules_c ? JSON.parse(course.modules_c) : []
+      }));
+    } catch (error) {
+      console.error("Error searching courses:", error?.message || error);
+      return [];
+    }
   },
 
   getCategories: async () => {
-    await delay(150);
-    const categories = [...new Set(coursesData.map((c) => c.category))];
-    return ["All", ...categories.sort()];
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const response = await apperClient.fetchRecords('course_c', {
+        fields: [{"field": {"Name": "category_c"}}]
+      });
+
+      if (!response.success || !response.data) {
+        console.error(response.message);
+        return ["All"];
+      }
+
+      const categories = [...new Set(response.data.map(c => c.category_c).filter(Boolean))];
+      return ["All", ...categories.sort()];
+    } catch (error) {
+      console.error("Error fetching categories:", error?.message || error);
+      return ["All"];
+    }
   },
 
   getLessonById: async (courseId, lessonId) => {
-    await delay(200);
-    const course = coursesData.find((c) => c.Id === parseInt(courseId));
-    if (!course) return null;
+    try {
+      const course = await courseService.getById(courseId);
+      if (!course) return null;
 
-    for (const module of course.modules) {
-      const lesson = module.lessons.find((l) => l.Id === parseInt(lessonId));
-      if (lesson) {
-        return { ...lesson, moduleTitle: module.title };
+      for (const module of course.modules) {
+        const lesson = module.lessons.find((l) => l.Id === parseInt(lessonId));
+        if (lesson) {
+          return { ...lesson, moduleTitle: module.title };
+        }
       }
+      return null;
+    } catch (error) {
+      console.error("Error fetching lesson:", error?.message || error);
+      return null;
     }
-    return null;
   }
 };
 

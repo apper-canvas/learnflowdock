@@ -86,7 +86,7 @@ const CourseDetail = () => {
         className="relative h-[400px] rounded-2xl overflow-hidden"
       >
         <img 
-          src={course.thumbnail} 
+src={course.thumbnail} 
           alt={course.title}
           className="w-full h-full object-cover"
         />

@@ -27,7 +27,7 @@ const EnrolledCourseCard = ({ course, enrollment }) => {
       <div className="flex gap-4">
         <div className="relative w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
           <img 
-            src={course.thumbnail} 
+src={course.thumbnail} 
             alt={course.title}
             className="w-full h-full object-cover"
           />
@@ -40,17 +40,17 @@ const EnrolledCourseCard = ({ course, enrollment }) => {
 
         <div className="flex-1 min-w-0">
           <div className="mb-2">
-            <Badge variant={course.difficulty.toLowerCase()} className="text-xs">
+<Badge variant={course.difficulty.toLowerCase()} className="text-xs">
               {course.difficulty}
             </Badge>
           </div>
 
           <h3 className="text-xl font-bold text-gray-900 mb-1 truncate">
-            {course.title}
+{course.title}
           </h3>
 
           <p className="text-sm text-gray-600 mb-3">
-            {course.instructor}
+{course.instructor}
           </p>
 
           <ProgressBar value={enrollment.progress} className="mb-4" />

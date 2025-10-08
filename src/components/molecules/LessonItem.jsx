@@ -47,7 +47,7 @@ const LessonItem = ({ lesson, isCompleted, isActive, isLocked, onClick }) => {
             "font-medium text-sm truncate",
             isActive ? "text-primary" : "text-gray-900"
           )}>
-            {lesson.title}
+{lesson.title}
           </h4>
         </div>
         <div className="text-xs text-gray-500">

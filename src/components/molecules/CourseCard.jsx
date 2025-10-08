@@ -20,12 +20,12 @@ const CourseCard = ({ course }) => {
     >
       <div className="relative h-48 overflow-hidden">
         <img 
-          src={course.thumbnail} 
+src={course.thumbnail} 
           alt={course.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-3 right-3">
-          <Badge variant={course.difficulty.toLowerCase()}>
+<Badge variant={course.difficulty.toLowerCase()}>
             {course.difficulty}
           </Badge>
         </div>
@@ -35,33 +35,33 @@ const CourseCard = ({ course }) => {
       <div className="p-5">
         <div className="mb-2">
           <Badge variant="default" className="text-xs">
-            {course.category}
+{course.category}
           </Badge>
         </div>
 
         <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-          {course.title}
+{course.title}
         </h3>
 
         <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-          {course.description}
+{course.description}
         </p>
 
         <div className="flex items-center justify-between text-sm text-gray-600">
           <div className="flex items-center gap-2">
             <ApperIcon name="User" size={16} />
-            <span>{course.instructor}</span>
+<span>{course.instructor}</span>
           </div>
           <div className="flex items-center gap-2">
             <ApperIcon name="Clock" size={16} />
-            <span>{formatDuration(course.duration)}</span>
+<span>{formatDuration(course.duration)}</span>
           </div>
         </div>
 
         <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-1 text-secondary">
             <ApperIcon name="Users" size={16} />
-            <span className="text-sm font-medium">{course.enrolledCount.toLocaleString()} enrolled</span>
+<span className="text-sm font-medium">{course.enrolledCount.toLocaleString()} enrolled</span>
           </div>
           <ApperIcon 
             name="ArrowRight" 

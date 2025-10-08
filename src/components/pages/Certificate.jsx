@@ -153,7 +153,7 @@ export default function Certificate() {
             </button>
             <h1 className="text-3xl font-bold text-gray-900">Certificate of Completion</h1>
             <p className="text-gray-600 mt-2">
-              Congratulations on completing {course.title}!
+Congratulations on completing {course.title}!
             </p>
           </div>
 
@@ -185,7 +185,7 @@ export default function Certificate() {
                 <p className="text-gray-600 text-lg">has successfully completed</p>
 
                 <h3 className="text-2xl font-bold text-primary px-8">
-                  {course.title}
+{course.title}
                 </h3>
 
                 <p className="text-gray-600">
@@ -258,7 +258,7 @@ export default function Certificate() {
                 <p className="font-medium mb-1">About Your Certificate</p>
                 <p className="text-blue-700">
                   This certificate verifies that you have successfully completed all course requirements 
-                  for "{course.title}". You can download it as a PDF and share it on your professional 
+for "{course.title}". You can download it as a PDF and share it on your professional 
                   profiles or with potential employers.
                 </p>
               </div>
