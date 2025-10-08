@@ -262,6 +262,68 @@ const courseService = {
       return null;
     } catch (error) {
       console.error("Error fetching lesson:", error?.message || error);
+return null;
+    }
+  },
+
+  create: async (courseData) => {
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const params = {
+        records: [
+          {
+            title_c: courseData.title,
+            description_c: courseData.description,
+            instructor_c: courseData.instructor,
+            thumbnail_c: courseData.thumbnail,
+            category_c: courseData.category,
+            difficulty_c: courseData.difficulty,
+            duration_c: parseInt(courseData.duration),
+            enrolled_count_c: parseInt(courseData.enrolledCount || 0),
+            modules_c: Array.isArray(courseData.modules) 
+              ? JSON.stringify(courseData.modules) 
+              : courseData.modules
+          }
+        ]
+      };
+
+      const response = await apperClient.createRecord('course_c', params);
+
+      if (!response.success) {
+        console.error(response.message);
+        return null;
+      }
+
+      if (response.results && response.results.length > 0) {
+        const result = response.results[0];
+        if (!result.success) {
+          console.error("Failed to create course:", result);
+          return null;
+        }
+
+        const course = result.data;
+        return {
+          Id: course.Id,
+          title: course.title_c,
+          description: course.description_c,
+          instructor: course.instructor_c,
+          thumbnail: course.thumbnail_c,
+          category: course.category_c,
+          difficulty: course.difficulty_c,
+          duration: course.duration_c,
+          enrolledCount: course.enrolled_count_c,
+          modules: course.modules_c ? JSON.parse(course.modules_c) : []
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error creating course:", error?.message || error);
       return null;
     }
   }
