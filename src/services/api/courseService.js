@@ -266,7 +266,39 @@ return null;
     }
   },
 
-  create: async (courseData) => {
+create: async (courseData) => {
+    // Generate course content using OpenAI via Edge function
+    try {
+      const { ApperClient } = window.ApperSDK;
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      });
+
+      const aiResult = await apperClient.functions.invoke(
+        import.meta.env.VITE_GENERATE_COURSE_CONTENT,
+        {
+          body: JSON.stringify({
+            title: courseData.title,
+            description: courseData.description
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      // Check if AI generation was successful
+      if (aiResult.success && aiResult.thumbnail && aiResult.modules) {
+        courseData.thumbnail = aiResult.thumbnail;
+        courseData.modules = aiResult.modules;
+      } else {
+        console.info(`apper_info: AI content generation returned an error. The response is: ${JSON.stringify(aiResult)}`);
+      }
+    } catch (error) {
+      console.info(`apper_info: Got this error in AI content generation: ${error.message}`);
+      // Continue with course creation even if AI generation fails
+    }
     try {
       const { ApperClient } = window.ApperSDK;
       const apperClient = new ApperClient({
@@ -277,17 +309,17 @@ return null;
       const params = {
         records: [
           {
-            title_c: courseData.title,
+title_c: courseData.title,
             description_c: courseData.description,
             instructor_c: courseData.instructor,
-            thumbnail_c: courseData.thumbnail,
+            thumbnail_c: courseData.thumbnail || '',
             category_c: courseData.category,
             difficulty_c: courseData.difficulty,
             duration_c: parseInt(courseData.duration),
             enrolled_count_c: parseInt(courseData.enrolledCount || 0),
             modules_c: Array.isArray(courseData.modules) 
               ? JSON.stringify(courseData.modules) 
-              : courseData.modules
+              : courseData.modules || '[]'
           }
         ]
       };

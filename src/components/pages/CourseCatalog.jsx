@@ -85,9 +85,9 @@ const handleSearch = async (query) => {
     }
 
     setSubmitting(true);
-    try {
+try {
+      toast.info('Generating course content with AI...');
       const newCourse = await courseService.create(formData);
-      
       if (newCourse) {
         toast.success("Course created successfully!");
         setShowAddModal(false);
