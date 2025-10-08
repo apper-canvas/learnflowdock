@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import courseService from "@/services/api/courseService";
-import enrollmentService from "@/services/api/enrollmentService";
+import { motion } from "framer-motion";
+import ApperIcon from "@/components/ApperIcon";
 import EnrolledCourseCard from "@/components/molecules/EnrolledCourseCard";
-import Button from "@/components/atoms/Button";
-import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import { motion } from "framer-motion";
+import Loading from "@/components/ui/Loading";
+import Button from "@/components/atoms/Button";
+import enrollmentService from "@/services/api/enrollmentService";
+import courseService from "@/services/api/courseService";
 
 const MyLearning = () => {
   const navigate = useNavigate();
@@ -172,12 +172,22 @@ const MyLearning = () => {
             Completed Courses
           </h2>
           <div className="space-y-4">
-            {completedCourses.map(({ course, enrollment }) => (
-              <EnrolledCourseCard
-                key={enrollment.Id}
-                course={course}
-                enrollment={enrollment}
-              />
+{completedCourses.map(({ course, enrollment }) => (
+              <div key={enrollment.Id} className="space-y-3">
+                <EnrolledCourseCard
+                  course={course}
+                  enrollment={enrollment}
+                />
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => navigate(`/certificates/${course.Id}`)}
+                    className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg transition-all"
+                  >
+                    <ApperIcon name="Award" size={18} />
+                    <span>View Certificate</span>
+                  </Button>
+                </div>
+              </div>
             ))}
           </div>
         </motion.section>

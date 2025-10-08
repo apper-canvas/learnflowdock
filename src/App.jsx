@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Certificate from "@/components/pages/Certificate";
 import { ToastContainer } from "react-toastify";
 import Layout from "@/components/organisms/Layout";
 import CourseCatalog from "@/components/pages/CourseCatalog";
@@ -15,7 +16,8 @@ const App = () => {
           <Route path="/courses" element={<CourseCatalog />} />
           <Route path="/courses/:courseId" element={<CourseDetail />} />
           <Route path="/courses/:courseId/lessons/:lessonId" element={<LessonViewer />} />
-          <Route path="/my-learning" element={<MyLearning />} />
+<Route path="/my-learning" element={<MyLearning />} />
+          <Route path="/certificates/:courseId" element={<Certificate />} />
         </Routes>
       </Layout>
       <ToastContainer 
