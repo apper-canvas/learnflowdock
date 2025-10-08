@@ -1,3 +1,20 @@
+import { toast } from "react-toastify";
+import React from "react";
+import Error from "@/components/ui/Error";
+
+// Safe JSON parser that handles various data states
+const safeJsonParse = (value, fallback) => {
+  if (value === null || value === undefined) return fallback;
+  if (typeof value === 'object') return value; // Already parsed
+  if (value === '') return fallback;
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    console.error('JSON parse error:', error);
+    return fallback;
+  }
+};
+
 const enrollmentService = {
   getAll: async () => {
     try {
@@ -30,10 +47,10 @@ const enrollmentService = {
         courseId: enrollment.course_id_c,
         enrolledDate: enrollment.enrolled_date_c,
         progress: enrollment.progress_c || 0,
-        completedLessons: enrollment.completed_lessons_c ? JSON.parse(enrollment.completed_lessons_c) : [],
-        quizScores: enrollment.quiz_scores_c ? JSON.parse(enrollment.quiz_scores_c) : {},
+completedLessons: safeJsonParse(enrollment.completed_lessons_c, []),
+        quizScores: safeJsonParse(enrollment.quiz_scores_c, {}),
         lastAccessedLesson: enrollment.last_accessed_lesson_c || "",
-        lessonNotes: enrollment.lesson_notes_c ? JSON.parse(enrollment.lesson_notes_c) : {}
+        lessonNotes: safeJsonParse(enrollment.lesson_notes_c, {})
       }));
     } catch (error) {
       console.error("Error fetching enrollments:", error?.message || error);
@@ -73,10 +90,10 @@ const enrollmentService = {
         courseId: enrollment.course_id_c,
         enrolledDate: enrollment.enrolled_date_c,
         progress: enrollment.progress_c || 0,
-        completedLessons: enrollment.completed_lessons_c ? JSON.parse(enrollment.completed_lessons_c) : [],
-        quizScores: enrollment.quiz_scores_c ? JSON.parse(enrollment.quiz_scores_c) : {},
+completedLessons: safeJsonParse(enrollment.completed_lessons_c, []),
+        quizScores: safeJsonParse(enrollment.quiz_scores_c, {}),
         lastAccessedLesson: enrollment.last_accessed_lesson_c || "",
-        lessonNotes: enrollment.lesson_notes_c ? JSON.parse(enrollment.lesson_notes_c) : {}
+        lessonNotes: safeJsonParse(enrollment.lesson_notes_c, {})
       };
     } catch (error) {
       console.error(`Error fetching enrollment ${id}:`, error?.message || error);
@@ -118,10 +135,10 @@ const enrollmentService = {
         courseId: enrollment.course_id_c,
         enrolledDate: enrollment.enrolled_date_c,
         progress: enrollment.progress_c || 0,
-        completedLessons: enrollment.completed_lessons_c ? JSON.parse(enrollment.completed_lessons_c) : [],
-        quizScores: enrollment.quiz_scores_c ? JSON.parse(enrollment.quiz_scores_c) : {},
+completedLessons: safeJsonParse(enrollment.completed_lessons_c, []),
+        quizScores: safeJsonParse(enrollment.quiz_scores_c, {}),
         lastAccessedLesson: enrollment.last_accessed_lesson_c || "",
-        lessonNotes: enrollment.lesson_notes_c ? JSON.parse(enrollment.lesson_notes_c) : {}
+        lessonNotes: safeJsonParse(enrollment.lesson_notes_c, {})
       };
     } catch (error) {
       console.error(`Error fetching enrollment for course ${courseId}:`, error?.message || error);
@@ -163,10 +180,10 @@ const enrollmentService = {
             courseId: created.course_id_c,
             enrolledDate: created.enrolled_date_c,
             progress: created.progress_c || 0,
-            completedLessons: created.completed_lessons_c ? JSON.parse(created.completed_lessons_c) : [],
-            quizScores: created.quiz_scores_c ? JSON.parse(created.quiz_scores_c) : {},
+completedLessons: safeJsonParse(created.completed_lessons_c, []),
+            quizScores: safeJsonParse(created.quiz_scores_c, {}),
             lastAccessedLesson: created.last_accessed_lesson_c || "",
-            lessonNotes: created.lesson_notes_c ? JSON.parse(created.lesson_notes_c) : {}
+            lessonNotes: safeJsonParse(created.lesson_notes_c, {})
           };
         }
       }
@@ -212,10 +229,10 @@ const enrollmentService = {
             courseId: updated.course_id_c,
             enrolledDate: updated.enrolled_date_c,
             progress: updated.progress_c || 0,
-            completedLessons: updated.completed_lessons_c ? JSON.parse(updated.completed_lessons_c) : [],
-            quizScores: updated.quiz_scores_c ? JSON.parse(updated.quiz_scores_c) : {},
+completedLessons: safeJsonParse(updated.completed_lessons_c, []),
+            quizScores: safeJsonParse(updated.quiz_scores_c, {}),
             lastAccessedLesson: updated.last_accessed_lesson_c || "",
-            lessonNotes: updated.lesson_notes_c ? JSON.parse(updated.lesson_notes_c) : {}
+            lessonNotes: safeJsonParse(updated.lesson_notes_c, {})
           };
         }
       }
