@@ -91,4 +91,3 @@ const quizService = {
 };
 
 export default quizService;
-export default quizService;
