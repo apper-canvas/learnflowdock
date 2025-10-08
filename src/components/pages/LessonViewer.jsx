@@ -4,6 +4,7 @@ import courseService from "@/services/api/courseService";
 import enrollmentService from "@/services/api/enrollmentService";
 import quizService from "@/services/api/quizService";
 import Button from "@/components/atoms/Button";
+import Input from "@/components/atoms/Input";
 import CourseCurriculum from "@/components/organisms/CourseCurriculum";
 import QuizQuestion from "@/components/molecules/QuizQuestion";
 import Loading from "@/components/ui/Loading";
@@ -11,13 +12,12 @@ import Error from "@/components/ui/Error";
 import ApperIcon from "@/components/ApperIcon";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
-
 const LessonViewer = () => {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const videoRef = useRef(null);
 
-  const [course, setCourse] = useState(null);
+const [course, setCourse] = useState(null);
   const [lesson, setLesson] = useState(null);
   const [enrollment, setEnrollment] = useState(null);
   const [quiz, setQuiz] = useState(null);
@@ -28,7 +28,9 @@ const LessonViewer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [lessonNotes, setLessonNotes] = useState([]);
+  const [newNoteText, setNewNoteText] = useState("");
   const loadData = async () => {
     try {
       setLoading(true);
@@ -62,7 +64,7 @@ const LessonViewer = () => {
     loadData();
   }, [courseId, lessonId]);
 
-  useEffect(() => {
+useEffect(() => {
     if (videoRef.current && lesson?.type === "video") {
       const video = videoRef.current;
       
@@ -83,6 +85,60 @@ const LessonViewer = () => {
     }
   }, [lesson, enrollment, courseId, lessonId, course]);
 
+  useEffect(() => {
+    async function loadNotes() {
+      if (enrollment && lessonId) {
+        try {
+          const notes = await enrollmentService.getNotes(courseId, lessonId);
+          setLessonNotes(notes);
+        } catch (err) {
+          console.error("Failed to load notes:", err);
+        }
+      }
+    }
+    loadNotes();
+  }, [enrollment, courseId, lessonId]);
+
+  const formatTimestamp = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleAddNote = async () => {
+    if (!newNoteText.trim() || !videoRef.current) return;
+
+    try {
+      const currentTime = videoRef.current.currentTime;
+      await enrollmentService.addNote(courseId, lessonId, newNoteText.trim(), currentTime);
+      const updatedNotes = await enrollmentService.getNotes(courseId, lessonId);
+      setLessonNotes(updatedNotes);
+      setNewNoteText("");
+      toast.success("Note added successfully!");
+    } catch (err) {
+      console.error("Failed to add note:", err);
+      toast.error("Failed to add note");
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      await enrollmentService.deleteNote(courseId, lessonId, noteId);
+      const updatedNotes = await enrollmentService.getNotes(courseId, lessonId);
+      setLessonNotes(updatedNotes);
+      toast.success("Note deleted!");
+    } catch (err) {
+      console.error("Failed to delete note:", err);
+      toast.error("Failed to delete note");
+    }
+  };
+
+  const handleSeekToTimestamp = (timestamp) => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = timestamp;
+      videoRef.current.play();
+    }
+  };
   const handleLessonClick = (newLessonId) => {
     navigate(`/courses/${courseId}/lessons/${newLessonId}`);
   };
@@ -166,8 +222,7 @@ const LessonViewer = () => {
   const nextLesson = getNextLesson();
   const currentQuestion = quiz?.questions[currentQuestionIndex];
   const currentResult = quizResults?.results[currentQuestionIndex];
-
-  return (
+return (
     <div className="flex gap-6 -mx-4 sm:-mx-6 lg:-mx-8">
       <AnimatePresence>
         {sidebarOpen && (
@@ -215,16 +270,92 @@ const LessonViewer = () => {
         </div>
 
         {lesson.type === "video" ? (
-          <div className="space-y-6">
-            <div className="bg-black rounded-xl overflow-hidden shadow-2xl aspect-video">
-              <video
-                ref={videoRef}
-                controls
-                className="w-full h-full"
-                src={lesson.videoUrl}
-              >
-                Your browser does not support the video tag.
-              </video>
+<div className="space-y-6">
+            <div className="relative">
+              <div className="bg-black rounded-xl overflow-hidden shadow-2xl aspect-video">
+                <video
+                  ref={videoRef}
+                  controls
+                  className="w-full h-full"
+                  src={lesson.videoUrl}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+
+              <AnimatePresence>
+                {notesOpen && (
+                  <motion.div
+                    initial={{ x: 400, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 400, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="absolute top-0 right-0 w-80 h-full bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col"
+                  >
+                    <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                      <h3 className="font-semibold text-lg text-gray-900">Lesson Notes</h3>
+                      <button
+                        onClick={() => setNotesOpen(false)}
+                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <ApperIcon name="X" size={20} />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                      {lessonNotes.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                          <ApperIcon name="FileText" size={48} className="mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No notes yet</p>
+                          <p className="text-xs mt-1">Add notes while watching</p>
+                        </div>
+                      ) : (
+                        lessonNotes.map((note) => (
+                          <div key={note.Id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                            <div className="flex items-start justify-between gap-2">
+                              <button
+                                onClick={() => handleSeekToTimestamp(note.timestamp)}
+                                className="text-primary font-semibold text-sm hover:underline"
+                              >
+                                {formatTimestamp(note.timestamp)}
+                              </button>
+                              <button
+                                onClick={() => handleDeleteNote(note.Id)}
+                                className="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                              >
+                                <ApperIcon name="Trash2" size={14} className="text-gray-500" />
+                              </button>
+                            </div>
+                            <p className="text-sm text-gray-700 leading-relaxed">{note.text}</p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="p-4 border-t border-gray-200 space-y-2">
+                      <Input
+                        value={newNoteText}
+                        onChange={(e) => setNewNoteText(e.target.value)}
+                        placeholder="Add a note at current time..."
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleAddNote();
+                          }
+                        }}
+                      />
+                      <Button
+                        onClick={handleAddNote}
+                        disabled={!newNoteText.trim()}
+                        className="w-full"
+                      >
+                        <ApperIcon name="Plus" size={16} className="mr-2" />
+                        Add Note
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="flex items-center justify-between">
@@ -236,6 +367,13 @@ const LessonViewer = () => {
                 <Button variant="ghost">
                   <ApperIcon name="Bookmark" size={18} className="mr-2" />
                   Save
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setNotesOpen(!notesOpen)}
+                >
+                  <ApperIcon name="FileText" size={18} className="mr-2" />
+                  Notes {lessonNotes.length > 0 && `(${lessonNotes.length})`}
                 </Button>
               </div>
               {nextLesson && (

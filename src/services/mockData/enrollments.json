@@ -6,15 +6,17 @@
     "progress": 25,
     "completedLessons": ["1", "2"],
     "quizScores": {},
-    "lastAccessedLesson": "2"
+    "lastAccessedLesson": "2",
+    "lessonNotes": {}
   },
-  {
+{
     "Id": 2,
     "courseId": "3",
     "enrolledDate": "2024-01-20",
     "progress": 10,
     "completedLessons": [],
     "quizScores": {},
-    "lastAccessedLesson": "8"
+    "lastAccessedLesson": "8",
+    "lessonNotes": {}
   }
 ]

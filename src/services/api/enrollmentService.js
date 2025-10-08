@@ -1,4 +1,6 @@
 import enrollmentsData from "@/services/mockData/enrollments.json";
+import React from "react";
+import Error from "@/components/ui/Error";
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -22,7 +24,7 @@ const enrollmentService = {
     return enrollment ? { ...enrollment } : null;
   },
 
-  create: async (enrollment) => {
+create: async (enrollment) => {
     await delay(300);
     const maxId = enrollments.length > 0 ? Math.max(...enrollments.map((e) => e.Id)) : 0;
     const newEnrollment = {
@@ -32,7 +34,8 @@ const enrollmentService = {
       progress: 0,
       completedLessons: [],
       quizScores: {},
-      lastAccessedLesson: enrollment.firstLessonId || ""
+      lastAccessedLesson: enrollment.firstLessonId || "",
+      lessonNotes: {}
     };
     enrollments.push(newEnrollment);
     return { ...newEnrollment };
@@ -68,8 +71,64 @@ const enrollmentService = {
 
     enrollment.quizScores[lessonId] = score;
     return { ...enrollment };
+},
+
+  addNote: async (courseId, lessonId, noteText, timestamp) => {
+    await delay(200);
+    const enrollment = enrollments.find((e) => e.courseId === courseId.toString());
+    if (!enrollment) {
+      throw new Error("Enrollment not found");
+    }
+
+    if (!enrollment.lessonNotes) {
+      enrollment.lessonNotes = {};
+    }
+
+    if (!enrollment.lessonNotes[lessonId]) {
+      enrollment.lessonNotes[lessonId] = [];
+    }
+
+    const lessonNotesList = enrollment.lessonNotes[lessonId];
+    const maxNoteId = lessonNotesList.length > 0 
+      ? Math.max(...lessonNotesList.map((n) => n.Id)) 
+      : 0;
+
+    const newNote = {
+      Id: maxNoteId + 1,
+      text: noteText,
+      timestamp: timestamp,
+      createdAt: new Date().toISOString()
+    };
+
+    enrollment.lessonNotes[lessonId].push(newNote);
+    return { ...newNote };
   },
 
+  getNotes: async (courseId, lessonId) => {
+    await delay(200);
+    const enrollment = enrollments.find((e) => e.courseId === courseId.toString());
+    if (!enrollment || !enrollment.lessonNotes || !enrollment.lessonNotes[lessonId]) {
+      return [];
+    }
+    return enrollment.lessonNotes[lessonId].map((note) => ({ ...note }));
+  },
+
+  deleteNote: async (courseId, lessonId, noteId) => {
+    await delay(200);
+    const enrollment = enrollments.find((e) => e.courseId === courseId.toString());
+    if (!enrollment || !enrollment.lessonNotes || !enrollment.lessonNotes[lessonId]) {
+      throw new Error("Notes not found");
+    }
+
+    const noteIndex = enrollment.lessonNotes[lessonId].findIndex((n) => n.Id === noteId);
+    if (noteIndex === -1) {
+      throw new Error("Note not found");
+    }
+
+enrollment.lessonNotes[lessonId].splice(noteIndex, 1);
+    return true;
+  },
+  
   delete: async (id) => {
     await delay(250);
     const index = enrollments.findIndex((e) => e.Id === parseInt(id));
