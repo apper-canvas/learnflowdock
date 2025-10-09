@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import courseService from "@/services/api/courseService";
-import enrollmentService from "@/services/api/enrollmentService";
-import Button from "@/components/atoms/Button";
-import Badge from "@/components/atoms/Badge";
-import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
-import ApperIcon from "@/components/ApperIcon";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import EnrollmentForm from "@/components/organisms/EnrollmentForm";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-
+import ApperIcon from "@/components/ApperIcon";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import enrollmentService from "@/services/api/enrollmentService";
+import courseService from "@/services/api/courseService";
 const CourseDetail = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [enrolling, setEnrolling] = useState(false);
-
+const [showEnrollForm, setShowEnrollForm] = useState(false);
   const loadData = async () => {
     try {
       setLoading(true);
@@ -40,7 +40,11 @@ const CourseDetail = () => {
     loadData();
   }, [courseId]);
 
-  const handleEnroll = async () => {
+const handleOpenEnrollForm = () => {
+    setShowEnrollForm(true);
+  };
+
+  const handleEnrollSubmit = async () => {
     try {
       setEnrolling(true);
       const firstLesson = course.modules[0]?.lessons[0];
@@ -49,6 +53,7 @@ const CourseDetail = () => {
         firstLessonId: firstLesson?.Id.toString()
       });
       setEnrollment(newEnrollment);
+      setShowEnrollForm(false);
       toast.success("Successfully enrolled in course!");
       if (firstLesson) {
         navigate(`/courses/${course.Id}/lessons/${firstLesson.Id}`);
@@ -244,14 +249,14 @@ src={course.thumbnail}
                   </Button>
                 </div>
               ) : (
-                <Button 
+<Button 
                   className="w-full" 
                   size="lg"
-                  onClick={handleEnroll}
+                  onClick={handleOpenEnrollForm}
                   disabled={enrolling}
                 >
                   <ApperIcon name="BookOpen" size={20} className="mr-2" />
-                  {enrolling ? "Enrolling..." : "Enroll Now"}
+                  Enroll Now
                 </Button>
               )}
 
@@ -278,6 +283,14 @@ src={course.thumbnail}
         </motion.div>
       </div>
     </div>
+{showEnrollForm && (
+      <EnrollmentForm
+        course={course}
+        onEnroll={handleEnrollSubmit}
+        onClose={() => setShowEnrollForm(false)}
+        isEnrolling={enrolling}
+      />
+    )}
   );
 };
 
