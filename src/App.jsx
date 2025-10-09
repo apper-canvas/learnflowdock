@@ -9,13 +9,13 @@ import CourseCatalog from "@/components/pages/CourseCatalog";
 import CourseDetail from "@/components/pages/CourseDetail";
 import LessonViewer from "@/components/pages/LessonViewer";
 import MyLearning from "@/components/pages/MyLearning";
+import Profile from "@/components/pages/Profile";
 import Login from "@/components/pages/Login";
 import Signup from "@/components/pages/Signup";
 import Callback from "@/components/pages/Callback";
 import ErrorPage from "@/components/pages/ErrorPage";
 import ResetPassword from "@/components/pages/ResetPassword";
 import PromptPassword from "@/components/pages/PromptPassword";
-
 export const AuthContext = createContext(null);
 
 function AppContent() {
@@ -131,7 +131,8 @@ function AppContent() {
         <Route path="/courses" element={<Layout><CourseCatalog /></Layout>} />
         <Route path="/courses/:courseId" element={<Layout><CourseDetail /></Layout>} />
         <Route path="/courses/:courseId/lessons/:lessonId" element={<Layout><LessonViewer /></Layout>} />
-        <Route path="/my-learning" element={<Layout><MyLearning /></Layout>} />
+<Route path="/my-learning" element={<Layout><MyLearning /></Layout>} />
+        <Route path="/profile" element={<Layout><Profile /></Layout>} />
         <Route path="/certificates/:courseId" element={<Layout><Certificate /></Layout>} />
       </Routes>
       <ToastContainer 

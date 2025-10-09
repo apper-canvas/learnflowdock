@@ -1,10 +1,10 @@
-import { useState, useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useSelector } from 'react-redux';
-import { AuthContext } from '../../App';
-import Button from "@/components/atoms/Button";
+import { useSelector } from "react-redux";
+import { AnimatePresence, motion } from "framer-motion";
+import { AuthContext } from "@/App";
 import ApperIcon from "@/components/ApperIcon";
-import { motion, AnimatePresence } from "framer-motion";
+import Button from "@/components/atoms/Button";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -14,27 +14,34 @@ const Header = () => {
   const { logout } = useContext(AuthContext);
 
   const navItems = [
-    { label: "Browse Courses", path: "/courses", icon: "Library" },
-    { label: "My Learning", path: "/my-learning", icon: "BookOpen" }
+    { path: "/dashboard", label: "Dashboard", icon: "LayoutDashboard" },
+    { path: "/courses", label: "Courses", icon: "BookOpen" },
+    { path: "/my-learning", label: "My Learning", icon: "GraduationCap" },
+    { path: "/profile", label: "Profile", icon: "User" }
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    return location.pathname === path;
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
+      <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-700 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-                <ApperIcon name="GraduationCap" size={24} className="text-white" />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-700 bg-clip-text text-transparent">
-                LearnFlow
-              </span>
-            </Link>
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-700 rounded-lg flex items-center justify-center">
+              <ApperIcon name="GraduationCap" size={24} className="text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">LearnHub</span>
+          </Link>
 
-            <nav className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center">
+            <nav className="flex items-center gap-2">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
@@ -52,16 +59,19 @@ const Header = () => {
             </nav>
           </div>
 
-<div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <Button variant="ghost" onClick={() => navigate("/courses")}>
               <ApperIcon name="Search" size={18} className="mr-2" />
               Search
             </Button>
-            <Button variant="ghost" onClick={logout}>
+            <Button variant="ghost" onClick={handleLogout}>
               <ApperIcon name="LogOut" size={18} className="mr-2" />
               Logout
             </Button>
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-700 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
+            <div 
+              onClick={() => navigate("/profile")}
+              className="w-10 h-10 bg-gradient-to-br from-primary to-purple-700 rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform"
+            >
               <ApperIcon name="User" size={20} className="text-white" />
             </div>
           </div>
@@ -121,7 +131,7 @@ const Header = () => {
                   ))}
                 </nav>
 
-<div className="pt-6 border-t border-gray-200 space-y-3">
+                <div className="pt-6 border-t border-gray-200 space-y-3">
                   <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-50">
                     <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-700 rounded-full flex items-center justify-center">
                       <ApperIcon name="User" size={24} className="text-white" />
@@ -133,7 +143,7 @@ const Header = () => {
                   </div>
                   <Button 
                     variant="ghost" 
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="w-full justify-start"
                   >
                     <ApperIcon name="LogOut" size={18} className="mr-2" />
