@@ -279,18 +279,19 @@ src={course.thumbnail}
                 </div>
               </div>
             </div>
-          </div>
+</div>
         </motion.div>
       </div>
+      
+      {showEnrollForm && (
+        <EnrollmentForm
+          course={course}
+          onEnroll={handleEnrollSubmit}
+          onClose={() => setShowEnrollForm(false)}
+          isEnrolling={enrolling}
+        />
+      )}
     </div>
-{showEnrollForm && (
-      <EnrollmentForm
-        course={course}
-        onEnroll={handleEnrollSubmit}
-        onClose={() => setShowEnrollForm(false)}
-        isEnrolling={enrolling}
-      />
-    )}
   );
 };
 
