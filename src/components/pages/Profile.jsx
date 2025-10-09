@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser } from '@/store/userSlice';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
 import ApperIcon from '@/components/ApperIcon';
@@ -7,6 +8,7 @@ import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 
 function Profile() {
+const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,6 +20,17 @@ function Profile() {
     email: user?.emailAddress || ''
   });
 
+  // Sync form data with Redux user state whenever user changes
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.emailAddress || ''
+      });
+    }
+  }, [user]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -26,13 +39,22 @@ function Profile() {
     }));
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
       // Simulate API call - in production, would integrate with ApperUI profile update
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Update Redux store with new user data
+      const updatedUser = {
+        ...user,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        emailAddress: formData.email
+      };
+      dispatch(setUser(updatedUser));
       
       toast.success('Profile updated successfully');
       setIsEditing(false);
