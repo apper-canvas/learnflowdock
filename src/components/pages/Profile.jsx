@@ -183,14 +183,15 @@ setFormData({
                 />
 </div>
               
-              <div>
+<div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
                 </label>
                 <Input
                   type="tel"
+                  name="phoneNumber"
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  onChange={handleInputChange}
                   placeholder="Enter your phone number"
                   className="w-full"
                 />
@@ -250,14 +251,12 @@ setFormData({
                 <p className="text-lg text-gray-900">{user.emailAddress}</p>
               </div>
 
-              {user.phoneNumber && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-500 mb-1">
-                    Phone Number
-                  </label>
-                  <p className="text-lg text-gray-900">{user.phoneNumber}</p>
-                </div>
-              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-1">
+                  Phone Number
+                </label>
+                <p className="text-lg text-gray-900">{user.phoneNumber || 'Not provided'}</p>
+              </div>
 
               {user.accounts && user.accounts.length > 0 && (
                 <div>
