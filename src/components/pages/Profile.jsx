@@ -14,19 +14,21 @@ const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   
   // Form state initialized with user data
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
-    email: user?.emailAddress || ''
+    email: user?.emailAddress || '',
+    phoneNumber: user?.phoneNumber || ''
   });
 
   // Sync form data with Redux user state whenever user changes
-  useEffect(() => {
+useEffect(() => {
     if (user) {
       setFormData({
         firstName: user.firstName || '',
         lastName: user.lastName || '',
-        email: user.emailAddress || ''
+        email: user.emailAddress || '',
+        phoneNumber: user.phoneNumber || ''
       });
     }
   }, [user]);
@@ -47,12 +49,13 @@ const handleSubmit = async (e) => {
       // Simulate API call - in production, would integrate with ApperUI profile update
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Update Redux store with new user data
+// Update Redux store with new user data
       const updatedUser = {
         ...user,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        emailAddress: formData.email
+        emailAddress: formData.email,
+        phoneNumber: formData.phoneNumber
       };
       dispatch(setUser(updatedUser));
       
@@ -67,10 +70,11 @@ const handleSubmit = async (e) => {
 
   const handleCancel = () => {
     // Reset form to original user data
-    setFormData({
+setFormData({
       firstName: user?.firstName || '',
       lastName: user?.lastName || '',
-      email: user?.emailAddress || ''
+      email: user?.emailAddress || '',
+      phoneNumber: user?.phoneNumber || ''
     });
     setIsEditing(false);
   };
@@ -103,10 +107,16 @@ const handleSubmit = async (e) => {
               <h1 className="text-3xl font-bold mb-2">
                 {user.firstName} {user.lastName}
               </h1>
-              <p className="text-white/90 flex items-center gap-2">
+<p className="text-white/90 flex items-center gap-2">
                 <ApperIcon name="Mail" size={16} />
                 {user.emailAddress}
               </p>
+              {user.phoneNumber && (
+                <p className="text-white/90 flex items-center gap-2">
+                  <ApperIcon name="Phone" size={16} />
+                  {user.phoneNumber}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -170,6 +180,19 @@ const handleSubmit = async (e) => {
                   onChange={handleInputChange}
                   placeholder="Enter email address"
                   required
+                />
+</div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <Input
+                  type="tel"
+                  value={formData.phoneNumber}
+                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  placeholder="Enter your phone number"
+                  className="w-full"
                 />
               </div>
 
