@@ -1,16 +1,25 @@
-import { useEffect, useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { AuthContext } from '../../App';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/layouts/Root';
+import { useSelector } from 'react-redux';
 
 function Login() {
-  const { isInitialized } = useContext(AuthContext);
+const { isInitialized } = useAuth();
+  const { user } = useSelector(state => state.user);
+  const navigate = useNavigate();
   
-  useEffect(() => {
+useEffect(() => {
     if (isInitialized) {
       const { ApperUI } = window.ApperSDK;
-      ApperUI.showLogin("#authentication");
+      if(!user) {
+        ApperUI.showLogin("#authentication");
+      } else {
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirectPath = searchParams.get('redirect');
+        navigate(redirectPath ? redirectPath : "/");
+      }
     }
-  }, [isInitialized]);
+  }, [isInitialized, user, navigate]);
   
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
