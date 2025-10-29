@@ -243,12 +243,21 @@ setFormData({
                 </div>
               </div>
 
-              <div>
+<div>
                 <label className="block text-sm font-medium text-gray-500 mb-1">
                   Email Address
                 </label>
                 <p className="text-lg text-gray-900">{user.emailAddress}</p>
               </div>
+
+              {user.phoneNumber && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">
+                    Phone Number
+                  </label>
+                  <p className="text-lg text-gray-900">{user.phoneNumber}</p>
+                </div>
+              )}
 
               {user.accounts && user.accounts.length > 0 && (
                 <div>
